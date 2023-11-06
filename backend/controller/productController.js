@@ -1,6 +1,8 @@
 
 const Product = require("../models/productModel");
-const mongoose = require('mongoose');
+const ErrorHandler = require("../utils/errorHandler");
+
+
 // Create Product --Admin
 exports.CreateProduct = async (req, res, next) => {
   const product = await Product.create(req.body);
@@ -19,17 +21,30 @@ exports.getAllProducts = async (req, res) => {
 };
 
 
+//  get Single product details
+
+exports.getProductDetails = async (req,res,next)=>{
+
+  const product = await Product.findById(req.params.id);
+
+    if(!product){
+        return next(new ErrorHandler('Product not found',400))     
+    }
+  res.status(200).json({
+    success:true,
+    product
+  })
+}
+
+
 //  update product --Admin
 
 exports.updateProduct = async (req,res,next)=> {
     const product = await Product.findById(req.params.id);
 
     if(!product){
-        return res.status(500).json({
-            success:false,
-            message:"Product not found"
-        })
-    }
+      return next(new ErrorHandler('Product not found',400))     
+  }
 
     const products = await Product.findByIdAndUpdate(req.params.id,req.body,{
         new:true,
@@ -44,59 +59,21 @@ exports.updateProduct = async (req,res,next)=> {
 
 //  Delete product --Admin 
 
-// exports.deleteProduct = async (req,res)=>{
-//   const product = await Product.findById(req.params.id);
-
-//   if(!product){
-//       return res.status(500).json({
-//           success:false,
-//           message:"Product not found"
-//       })
-//   }
-
-//   const  products = await Product.findByIdAndRemove(req.params.id);
-
-//   res.status({
-//     success:true,
-//     message:"Product deleted successfully"
-//   })
-
-  
-
-// }
-
-exports.deleteProduct = async (req, res) => {
+exports.deleteProduct = async (req, res, next) => {
   try {
-    if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid product ID"
-      });
-    }
-
     const product = await Product.findById(req.params.id);
 
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: "Product not found"
-      });
-    }
+    if(!product){
+      return next(new ErrorHandler('Product not found',400))     
+  }
 
-    const removedProduct = await Product.findByIdAndDelete(req.params.id);
+       await product.findByIdAndDelete(req.params.id);
    
+     res.status(200).json({
+      success: true,
+      message: "Product deleted successfully"
+    });
 
-    if (removedProduct) {
-      return res.status(200).json({
-        success: true,
-        message: "Product deleted successfully"
-      });
-    } else {
-      return res.status(500).json({
-        success: false,
-        message: "Error deleting product"
-      });
-    }
   } catch (err) {
     console.error(err);
     res.status(500).json({
