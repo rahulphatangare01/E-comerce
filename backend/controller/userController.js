@@ -64,3 +64,22 @@ exports.logout = catchAsyncError(async (req,res,next)=>{
     message:"User Logged out Successfully"
   })
 })
+
+//  Forgot Password 
+
+exports.forgotPassword = catchAsyncError(async (req,res,next)=>{
+  const user = await User.findOne({email:req.body.email});
+
+  if(!user){
+    return next(new ErrorHandler("user not found",404));
+
+  }
+
+  //  get reset passwordToken 
+
+  const resetToken = user.getResetPasswordToken();
+
+  await user.save({validateBeforeSave:false});
+  const resetPasswordUrl = `${req.protocol}://${req.get("host")}/api/v1/password/reset/${resetToken}`
+
+})
