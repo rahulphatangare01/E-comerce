@@ -1,5 +1,3 @@
-
-const { response } = require("express");
 const catchAsyncError = require("../middlewares/catchAsyncError");
 const Product = require("../models/productModel");
 const ApiFeatures = require("../utils/apiFeature");
@@ -87,10 +85,10 @@ exports.deleteProduct = catchAsyncError( async (req, res, next) => {
   
 })
 
-//  Create new Review or Update the review
+// Create New Review or Update the review
 
-exports.createProductReview = catchAsyncError(async(req,res,next)=>{
-  const {rating,comment, productId} = req.body;
+exports.productReview = catchAsyncError(async (req, res, next) => { 
+  const { rating, comment, productId } = req.body;
 
   const review = {
     user: req.user._id,
@@ -100,27 +98,31 @@ exports.createProductReview = catchAsyncError(async(req,res,next)=>{
   };
 
   const product = await Product.findById(productId);
-  const isReviewed = product.reviews.find( (rev)=> rev.user.toString() === req.user._id.toString());
+  const isReviewed = product.reviews.find(
+    (rev) => rev.user.toString() === req.user._id.toString()
+  );
 
-  if(!isReviewed){
-    product.reviews.forEach((rev)=>{
-      if(rev.user.toString() === req.user._id.toString())
-      (rev.rating = rating), (rev.comment = comment);
+  if (isReviewed) {
+    product.reviews.forEach((rev) => {
+      if (rev.user.toString() === req.user._id.toString())
+        (rev.rating = rating), (rev.comment = comment);
     });
-  }
-  else{
+  } else {
     product.reviews.push(review);
-    product.numOfReviews = product.reviews.length
+    product.numOfReviews = product.reviews.length;
   }
 
   let avg = 0;
-  product.ratings = product.reviews.forEach(rev=>{
-    avg+=rev.rating
-  })/product.reviews.length
 
-  await product.save({ validateBeforeSave:false});
+  product.reviews.forEach((rev) => {
+    avg += rev.rating;
+  });
 
-  response.status(200).json({
-    success: true
-  })
-})
+  product.ratings = avg / product.reviews.length;
+
+  await product.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    success: true,
+  });
+});
