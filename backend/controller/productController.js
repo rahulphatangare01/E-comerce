@@ -74,7 +74,7 @@ exports.deleteProduct = catchAsyncError( async (req, res, next) => {
       return next(new ErrorHandler('Product not found',400))     
   }
 
-     await product.findByIdAndDelete(req.params.id);
+     await product.deleteOne();
    
      res.status(200).json({
       success: true,
