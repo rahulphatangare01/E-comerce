@@ -1,11 +1,14 @@
 import './App.css';
-import Header from "./components/layout/Header";
 import {BrowserRouter as Router} from "react-router-dom"
+import Headers from './components/layout/Headers';
+import NavScrollExample from './components/layout/Nav';
+
 function App() {
   return (
    <>
 <Router>
-<Header/>
+<Headers/>
+<NavScrollExample />
 </Router>
    </>
   );
