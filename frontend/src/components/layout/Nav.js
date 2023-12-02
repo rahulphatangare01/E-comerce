@@ -39,7 +39,6 @@ function NavScrollExample() {
               className="me-2"
               aria-label="Search"
             />
-            {/* <Button variant="outline-success">Search</Button> */}
           </Form>
           <Nav.Link href="#"><img src='../../images/logo.jpg' width={20} height={20}></img> </Nav.Link>
           <Nav.Link href="#"> <img src='../../images/id-badge-solid.svg' width={20} height={20}></img> </Nav.Link>
