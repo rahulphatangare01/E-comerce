@@ -19,12 +19,21 @@ exports.CreateProduct = catchAsyncError( async (req, res, next) => {
 //  get All Products
 exports.getAllProducts = catchAsyncError( async (req, res) => {
 
+  // return next(new ErrorHandler('This is custom error', 404))
   const resultPerPage = 8;
-  const productCount = await Product.countDocuments();
-  const ApiFeature = new ApiFeatures(Product.find(),req.query).search().filter().pagination(resultPerPage)
-  const products = await ApiFeature.query;
+  const productsCount = await Product.countDocuments();
+  const ApiFeature = new ApiFeatures(Product.find(),req.query)
+  .search()
+  .filter()
+  
+  let products = await ApiFeature.query;
 
-  res.status(200).json({ success: true, products, productCount });
+  let filtererdProductCount = products.length;
+  
+  ApiFeature.pagination(resultPerPage)
+  // products = await ApiFeature.query;
+
+  res.status(200).json({ success: true, products, productsCount, resultPerPage, filtererdProductCount });
 })
 
 
